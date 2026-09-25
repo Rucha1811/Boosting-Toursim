@@ -124,13 +124,48 @@ Point the DNS `A` record at the server IP first.
 1. **Postgres** — provision a managed Postgres, copy its connection string.
 2. **Backend** — build from `backend/` (Dockerfile included), port `8000`, health path `/api/destinations`.
    Env: `DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGINS=https://your-frontend-domain`, `SEED_ON_STARTUP=true`.
-3. **Frontend** — build from `frontend/`, static output in `dist/`, publish directory `dist`.
-   Set the build arg `VITE_API_TARGET` to your backend's public URL and route `/api` + `/ws` to it.
+3. **Frontend** — build from `frontend/`, static output in `dist/`, publish directory `dist`, and
+   route `/api` to the backend (see Option C for the exact rewrite).
 4. Because this is a Vite SPA, add a **rewrite** rule sending all unmatched paths to `/index.html`, or deep links like `/authority` will 404 on refresh.
 
 ### Option C — frontend on Vercel/Netlify + backend anywhere
 
-Deploy `frontend/` as a Vite project (framework preset "Vite", output `dist`, rewrite all → `index.html`), set `VITE_API_TARGET` to the deployed backend URL, and add that frontend domain to the backend's `CORS_ORIGINS`.
+The frontend calls `/api` **relatively**, so the recommended setup is to proxy `/api` from the CDN to the backend. Requests then stay same-origin, the SPA fallback works, and CORS is never involved.
+
+1. Deploy `frontend/` (Root Directory = `frontend`). `vercel.json` is included and already sets build command, `dist` output, the `/api/:path*` proxy and the SPA fallback — you only need to replace `YOUR-BACKEND-HOST`.
+2. Replace the placeholder in `frontend/vercel.json`:
+
+   ```json
+   "destination": "https://api.your-domain.com/api/:path*"
+   ```
+
+3. Deploy the backend separately (Render/Railway/Fly) from `backend/`, port `8000`, and set `DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGINS`, `SEED_ON_STARTUP=true`.
+
+Only if your host cannot rewrite `/api`, set the build-time env var `VITE_API_TARGET=https://api.your-domain.com` instead — `api.ts` then calls the backend by absolute URL and the backend **must** list the frontend origin in `CORS_ORIGINS` (custom `X-Destination-Id` header triggers a preflight). It is baked in at build time, so changing it requires a redeploy.
+
+<details>
+<summary>Netlify equivalent (<code>frontend/netlify.toml</code>)</summary>
+
+```toml
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://api.your-domain.com/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+```
+
+</details>
+
+> The UI refreshes by polling every 20s, not by WebSocket, so no socket or `wss://` configuration is required on the CDN. The backend still exposes `/ws` for programmatic use.
 
 ### Before going live
 

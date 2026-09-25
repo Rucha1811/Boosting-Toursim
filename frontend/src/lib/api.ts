@@ -1,4 +1,14 @@
-const BASE = "/api";
+/* API base resolution.
+ * - Default (no env var): stay relative to "/api". This is what the Docker
+ *   nginx container and the Vercel/Netlify rewrite both proxy server-side,
+ *   so requests stay same-origin and CORS never applies.
+ * - VITE_API_TARGET set: use it as an absolute backend origin, e.g.
+ *   https://api.example.com -> https://api.example.com/api. Required when the
+ *   host cannot rewrite /api, and the backend must then allow this origin
+ *   via CORS_ORIGINS.
+ * The value is read at BUILD time, so changing it requires a rebuild. */
+const API_TARGET = (import.meta.env.VITE_API_TARGET || "").trim().replace(/\/+$/, "");
+const BASE = API_TARGET ? `${API_TARGET}/api` : "/api";
 
 /** Module-level active destination id. The React destination context calls
  *  setCurrentDestinationId() on switch; every request reads it live so polls

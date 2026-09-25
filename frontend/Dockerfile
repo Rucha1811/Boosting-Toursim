@@ -5,6 +5,9 @@ COPY package*.json ./
 RUN npm ci || npm install
 COPY . .
 
+# Optional. Leave unset (the default) so the app calls "/api" relative and
+# nginx below proxies it to the backend container. Only set an absolute origin
+# if you host the API somewhere nginx cannot reach.
 ARG VITE_API_TARGET=/api
 ENV VITE_API_TARGET=$VITE_API_TARGET
 RUN npm run build
