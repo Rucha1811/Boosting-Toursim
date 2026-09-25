@@ -1,0 +1,16 @@
+# CRITICAL: without this, the host's darwin node_modules (esbuild/rollup
+# binaries) get copied into the linux image and `npm run build` fails.
+node_modules/
+dist/
+build/
+.vite/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+npm-debug.log*
+coverage/
+.DS_Store
+.git/
+.gitignore
+README.md

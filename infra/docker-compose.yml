@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: virsa-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-virsa}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-virsa}
+      POSTGRES_DB: ${POSTGRES_DB:-virsa}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-virsa} -d ${POSTGRES_DB:-virsa}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ../backend
+    container_name: virsa-backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-virsa}:${POSTGRES_PASSWORD:-virsa}@postgres:5432/${POSTGRES_DB:-virsa}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost,http://localhost:8080}
+      JWT_SECRET: ${JWT_SECRET:-virsa-demo-secret-change-in-prod}
+      SEED_ON_STARTUP: ${SEED_ON_STARTUP:-true}
+      DEMO_MODE: ${DEMO_MODE:-true}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ../frontend
+      args:
+        VITE_API_TARGET: ${VITE_API_TARGET:-/api}
+    container_name: virsa-frontend
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+volumes:
+  pgdata:

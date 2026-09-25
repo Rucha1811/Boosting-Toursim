@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  background: #f5efe4;
+  color: #1d1a16;
+}
+
+.font-display {
+  font-family: "Fraunces", Georgia, serif;
+}
+
+.leaflet-container {
+  font-family: "Inter", system-ui, sans-serif;
+  background: #efe8da;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgb(29 26 22 / 0.15);
+}
+
+.leaflet-div-icon {
+  background: transparent;
+  border: none;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full font-medium transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-lg {
+    @apply px-7 py-3.5 text-base;
+  }
+  .btn-md {
+    @apply px-5 py-2.5 text-sm;
+  }
+  .btn-sm {
+    @apply px-3.5 py-1.5 text-xs;
+  }
+  .btn-primary {
+    @apply bg-teal text-white hover:bg-teal-deep text-white shadow-card;
+  }
+  .btn-dark {
+    @apply bg-ink text-sand-100 hover:bg-black;
+  }
+  .btn-outline {
+    @apply border border-ink/20 text-ink hover:border-teal hover:text-teal bg-white/60 backdrop-blur;
+  }
+  .btn-saffron {
+    @apply bg-saffron text-white hover:bg-saffron-deep;
+  }
+  .input {
+    @apply w-full rounded-xl border border-ink/15 bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-faint outline-none transition focus:border-teal focus:ring-2 focus:ring-teal/20;
+  }
+  .label {
+    @apply block text-xs font-semibold uppercase tracking-wide text-ink-muted mb-1.5;
+  }
+  .card {
+    @apply rounded-2xl bg-white shadow-card border border-ink/5;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-thumb {
+  background: #c5b493;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.report-enter {
+  animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Decorative texture utilities */
+
+.bg-dots-ink {
+  background-image: radial-gradient(rgba(29, 26, 22, 0.08) 1.2px, transparent 1.2px);
+  background-size: 18px 18px;
+}
+
+.bg-dots-light {
+  background-image: radial-gradient(rgba(245, 239, 228, 0.18) 1.2px, transparent 1.2px);
+  background-size: 18px 18px;
+}
+
+.bg-mesh-soft {
+  background-image: radial-gradient(at 18% 22%, rgb(224 118 44 / 0.35) 0, transparent 46%),
+    radial-gradient(at 82% 12%, rgb(194 69 79 / 0.28) 0, transparent 42%),
+    radial-gradient(at 68% 84%, rgb(46 125 115 / 0.32) 0, transparent 48%);
+}
+
+.bg-toran {
+  background-image: radial-gradient(circle at 10px 10px, rgba(232, 167, 16, 0.16) 4px, transparent 5px),
+    radial-gradient(circle at 34px 26px, rgba(224, 118, 44, 0.14) 4px, transparent 5px),
+    radial-gradient(circle at 58px 10px, rgba(14, 93, 84, 0.16) 4px, transparent 5px);
+  background-size: 68px 44px;
+}
+
+.text-glow-sun {
+  text-shadow: 0 2px 24px rgba(232, 167, 16, 0.35);
+}
